@@ -5,12 +5,13 @@
 #include <sys/stat.h>
 
 // Import project's libs
-#include "lib/color.h"
+#include "../lib/color.h"
+#include "../lib/fs.h"
 
 int create_directories() {
     printf(BOLD_CYAN "Creating necessary directories...\n" COLOR_RESET);
 
-    char directories[255][255] = {
+    const char *directories[] = {
         "/var/www/svh",
         "/etc/serverview",
         "/etc/serverview/sites-enabled",
@@ -18,17 +19,10 @@ int create_directories() {
         "/var/log/serverview",
         "/var/serverview/default"
     };
+    int num_directories = sizeof(directories) / sizeof(directories[0]);
 
-    for (int i = 0; i < sizeof(directories) / sizeof(directories[0]); i++) {
-        if(stat(directories[i], & (struct stat) {0}) == -1) {
-            if (errno != ENOENT) {
-                fprintf(stderr, BOLD_RED "Error checking directory %s: %s\n" COLOR_RESET, directories[i], strerror(errno));
-                return 1;
-            }
-        } else {
-            continue;
-        }
-        if (mkdir(directories[i], 0755) != 0) {
+    for (int i = 0; i < num_directories; i++) {
+        if (make_directory(directories[i]) != 0) {
             fprintf(stderr, BOLD_RED "Error creating directory %s: %s\n" COLOR_RESET, directories[i], strerror(errno));
             return 1;
         }
@@ -58,8 +52,18 @@ int create_default_website() {
         fprintf(stderr, BOLD_RED "Error creating default website: %s\n" COLOR_RESET, strerror(errno));
         return 1;
     }
-    fprintf(index_file, "<h1>Welcome to ServerView</h1>\n");
-    fprintf(index_file, "<p>This is the default website.</p>\n");
+    fprintf(index_file, 
+        "<DOCTYPE html>\n"
+        "<html>\n"
+        "   <head>\n"
+        "       <title>Server view default page</title>\n"
+        "   </head>\n"
+        "   <body>\n"
+        "       <h1>Server view default page</h1>\n"
+        "       <p>If you see this page, the server view CLI is successfully installed and working. The current version of the core is <system get=\"version\"></system></p>\n"
+        "   </body>\n"
+        "</html>\n"
+    );
     fclose(index_file);
     return 0;
 }
