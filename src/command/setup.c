@@ -13,7 +13,6 @@ int create_directories() {
         "/etc/serverview/sites-enabled",
         "/etc/serverview/sites-available",
         "/var/log/serverview",
-        "/var/serverview",
         "/var/serverview/default"
     };
 
