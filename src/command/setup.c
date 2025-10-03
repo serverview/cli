@@ -1,8 +1,11 @@
-#include "lib/color.h"
-#include <sys/stat.h>
+// Import standard libs
+#include <errno.h>
 #include <stdio.h>
 #include <string.h>
-#include <errno.h>
+#include <sys/stat.h>
+
+// Import project's libs
+#include "lib/color.h"
 
 int create_directories() {
     printf(BOLD_CYAN "Creating necessary directories...\n" COLOR_RESET);
