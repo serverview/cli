@@ -26,6 +26,9 @@ int main(int argc, char *argv[]) {
             printf("Commands:\n\n");
             printf("Flags:\n");
             printf("  " BOLD_YELLOW "--help" COLOR_RESET "    Display this help message\n");
+        } if (strcmp(command, "setup") == 0) {
+            printf(BOLD_CYAN "Help for command '%s':\n" COLOR_RESET, command);
+            printf("  Sets up the environment for the project.\n");
         } else {
             fprintf(stderr, BOLD_RED "Help for command '%s' is not yet implemented.\n" COLOR_RESET, command);
         }
@@ -33,6 +36,8 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, BOLD_RED "Usage: %s <command> [options]\n" COLOR_RESET, argv[0]);
         fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
         return 1;
+    } else if (strcmp(command, "setup") == 0) {
+        printf("Setting up the environment...\n");
     } else {
         fprintf(stderr, BOLD_RED "%s: '%s' is not a %s command. See '%s --help'.\n" COLOR_RESET, argv[0], command, argv[0], argv[0]);
         return 1;
