@@ -134,16 +134,46 @@ int enable_default_site() {
     return 0;
 }
 
-int start_default_site() {
-    printf(BOLD_CYAN "Starting default site...\n" COLOR_RESET);
-    if (start_process("/etc/serverview/sites-enabled/default", "/var/run/serverview/default.pid") < 0) {
-        fprintf(stderr, BOLD_RED "Failed to start default site.\n" COLOR_RESET);
+int install_service(const char *executable_path) {
+    printf(BOLD_CYAN "Installing systemd service...\n" COLOR_RESET);
+
+    const char *service_file_path = "/etc/systemd/system/svcore.service";
+    FILE *service_file = fopen(service_file_path, "w");
+    if (!service_file) {
+        perror("Failed to create service file");
         return 1;
     }
+
+    fprintf(service_file, "[Unit]\n");
+    fprintf(service_file, "Description=svcore service\n");
+    fprintf(service_file, "After=network.target\n\n");
+    fprintf(service_file, "[Service]\n");
+    fprintf(service_file, "Type=forking\n");
+    fprintf(service_file, "ExecStart=%s start-all\n", executable_path);
+    fprintf(service_file, "Restart=on-failure\n");
+    fprintf(service_file, "User=root\n\n");
+    fprintf(service_file, "[Install]\n");
+    fprintf(service_file, "WantedBy=multi-user.target\n");
+
+    fclose(service_file);
+
+    printf("Reloading systemd daemon...\n");
+    if (system("systemctl daemon-reload") != 0) {
+        fprintf(stderr, "Failed to reload systemd daemon.\n");
+        // This is not a fatal error, so we don't return 1
+    }
+
+    printf("Enabling svcore service...\n");
+    if (system("systemctl enable svcore") != 0) {
+        fprintf(stderr, "Failed to enable svcore service.\n");
+        // This is not a fatal error
+    }
+
+    printf(BOLD_GREEN "Systemd service installed and enabled successfully.\n" COLOR_RESET);
     return 0;
 }
 
-int setup() {
+int setup(const char *executable_path) {
     if (geteuid() != 0) {
         fprintf(stderr, BOLD_RED "This command must be run as root.\n" COLOR_RESET);
         return 1;
@@ -182,9 +212,16 @@ int setup() {
     if (enable_default_site() != 0) {
         return 1;
     }
-    if (start_default_site() != 0) {
+    if (install_service(executable_path) != 0) {
         return 1;
     }
+
+    printf("Starting svcore service...\n");
+    if (system("systemctl start svcore") != 0) {
+        fprintf(stderr, "Failed to start svcore service.\n");
+        return 1;
+    }
+    printf(BOLD_GREEN "svcore service started successfully.\n" COLOR_RESET);
 
     return 0;
 }

@@ -2,10 +2,11 @@
 
 echo "Resetting setup..."
 
-# Stop the default site process
-if [ -f /var/run/serverview/default.pid ]; then
-    kill $(cat /var/run/serverview/default.pid)
-fi
+# Stop and disable the systemd service
+systemctl stop svcore
+systemctl disable svcore
+rm -f /etc/systemd/system/svcore.service
+systemctl daemon-reload
 
 # Remove directories
 rm -rf /var/www/svh
