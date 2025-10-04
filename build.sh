@@ -1,2 +1,2 @@
 #!/bin/bash
-find src -name "*.c" | xargs gcc -o dist/svctl
+gcc -o dist/svctl $(find src -name "*.c") -lcurl
