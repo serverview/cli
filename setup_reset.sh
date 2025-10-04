@@ -8,4 +8,7 @@ rm -rf /etc/serverview
 rm -rf /var/log/serverview
 rm -rf /var/serverview
 
+# Remove core file
+rm -f /usr/local/sbin/svcore
+
 echo "Setup reset complete."
