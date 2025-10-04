@@ -30,7 +30,7 @@ char* get_latest_core_version() {
     const char *url = "https://api.github.com/repos/serverview/core/releases/latest";
     Response res;
     struct curl_slist *headers = NULL;
-    headers = curl_slist_append(headers, "User-Agent: svcli");
+    headers = curl_slist_append(headers, "User-Agent: serverview-controller-cli");
 
     if (get_request(url, &res, headers) != 0) {
         fprintf(stderr, "Failed to get latest version\n");
