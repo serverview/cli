@@ -28,7 +28,7 @@ static size_t write_callback(void *data, size_t size, size_t nmemb, void *userp)
     return realsize;
 }
 
-int get_request(const char *url, Response *res) {
+int get_request(const char *url, Response *res, struct curl_slist *headers) {
     CURL *curl;
     CURLcode curl_res;
 
@@ -41,6 +41,9 @@ int get_request(const char *url, Response *res) {
         curl_easy_setopt(curl, CURLOPT_URL, url);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)res);
+        if (headers) {
+            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+        }
 
         curl_res = curl_easy_perform(curl);
         if(curl_res != CURLE_OK) {
