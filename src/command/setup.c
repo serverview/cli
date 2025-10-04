@@ -157,13 +157,13 @@ int install_service(const char *executable_path) {
 
     fclose(service_file);
 
-    printf("Reloading systemd daemon...\n");
+    printf(BOLD_CYAN "Reloading systemd daemon...\n" COLOR_RESET);
     if (system("systemctl daemon-reload") != 0) {
         fprintf(stderr, "Failed to reload systemd daemon.\n");
         // This is not a fatal error, so we don't return 1
     }
 
-    printf("Enabling svcore service...\n");
+    printf(BOLD_CYAN "Enabling svcore service...\n" COLOR_RESET);
     if (system("systemctl enable svcore") != 0) {
         fprintf(stderr, "Failed to enable svcore service.\n");
         // This is not a fatal error
@@ -171,6 +171,15 @@ int install_service(const char *executable_path) {
 
     printf(BOLD_GREEN "Systemd service installed and enabled successfully.\n" COLOR_RESET);
     return 0;
+}
+
+int start_service() {
+    printf(BOLD_CYAN "Starting svcore service...\n" COLOR_RESET);
+    if (system("systemctl start svcore") != 0) {
+        fprintf(stderr, BOLD_RED "Failed to start svcore service.\n" COLOR_RESET);
+        return 1;
+    }
+    printf(BOLD_GREEN "svcore service started successfully.\n" COLOR_RESET);
 }
 
 int setup(const char *executable_path) {
@@ -215,13 +224,9 @@ int setup(const char *executable_path) {
     if (install_service(executable_path) != 0) {
         return 1;
     }
-
-    printf("Starting svcore service...\n");
-    if (system("systemctl start svcore") != 0) {
-        fprintf(stderr, "Failed to start svcore service.\n");
+    if (start_service() != 0) {
         return 1;
     }
-    printf(BOLD_GREEN "svcore service started successfully.\n" COLOR_RESET);
 
     return 0;
 }
