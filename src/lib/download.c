@@ -1,8 +1,12 @@
+// Import standard libs
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "download.h"
+
+// Import project's libs
 #include "../lib/request.h"
+#include "../lib/color.h"
 
 int download_file(const char *url, const char *output_path) {
     char command[1024];
@@ -14,9 +18,9 @@ int download_file(const char *url, const char *output_path) {
     int status = system(command);
     
     if (status == 0) {
-        printf("Download successful.\n");
+        printf(BOLD_GREEN "Download successful.\n" COLOR_RESET);
     } else {
-        fprintf(stderr, "Download failed.\n");
+        fprintf(stderr, BOLD_RED "Download failed.\n" COLOR_RESET);
     }
     
     return status;
