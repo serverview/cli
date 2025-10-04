@@ -111,7 +111,7 @@ int create_default_website() {
         "   </head>\n"
         "   <body>\n"
         "       <h1>Server view default page</h1>\n"
-        "       <p>If you see this page, the server view CLI is successfully installed and working. The current version of the core is <system get=\"version\"></system></p>\n"
+        "       <p>If you see this page, the server view CLI is successfully installed and working. The current version of the core is <system get=\"version\"></system>.</p>\n"
         "   </body>\n"
         "</html>\n"
     );
