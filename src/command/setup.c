@@ -133,6 +133,11 @@ int enable_default_site() {
 }
 
 int setup() {
+    if (geteuid() != 0) {
+        fprintf(stderr, BOLD_RED "This command must be run as root.\n" COLOR_RESET);
+        return 1;
+    }
+
     printf(BOLD_CYAN "Setting up the environment...\n" COLOR_RESET);
 
     char *latest_version = get_latest_core_version();
