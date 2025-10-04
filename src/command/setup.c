@@ -10,6 +10,7 @@
 #include "../lib/color.h"
 #include "../lib/fs.h"
 #include "../lib/download.h"
+#include "../lib/process.h"
 
 const char *core_download_path = "/tmp/svcore";
 
@@ -66,7 +67,8 @@ int create_directories() {
         "/etc/serverview/sites-enabled",
         "/etc/serverview/sites-available",
         "/var/log/serverview",
-        "/var/serverview/default"
+        "/var/serverview/default",
+        "/var/run/serverview"
     };
     int num_directories = sizeof(directories) / sizeof(directories[0]);
 
@@ -132,6 +134,15 @@ int enable_default_site() {
     return 0;
 }
 
+int start_default_site() {
+    printf(BOLD_CYAN "Starting default site...\n" COLOR_RESET);
+    if (start_process("/etc/serverview/sites-enabled/default", "/var/run/serverview/default.pid") < 0) {
+        fprintf(stderr, BOLD_RED "Failed to start default site.\n" COLOR_RESET);
+        return 1;
+    }
+    return 0;
+}
+
 int setup() {
     if (geteuid() != 0) {
         fprintf(stderr, BOLD_RED "This command must be run as root.\n" COLOR_RESET);
@@ -169,6 +180,9 @@ int setup() {
         return 1;
     }
     if (enable_default_site() != 0) {
+        return 1;
+    }
+    if (start_default_site() != 0) {
         return 1;
     }
 
