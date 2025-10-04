@@ -3,10 +3,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <stdlib.h>
 
 // Import project's libs
 #include "../lib/color.h"
 #include "../lib/fs.h"
+#include "../lib/download.h"
 
 int create_directories() {
     printf(BOLD_CYAN "Creating necessary directories...\n" COLOR_RESET);
@@ -70,6 +72,14 @@ int create_default_website() {
 
 int setup() {
     printf(BOLD_CYAN "Setting up the environment...\n" COLOR_RESET);
+
+    char *latest_version = get_latest_core_version();
+    if (latest_version != NULL) {
+        printf("Latest core version: %s\n", latest_version);
+        free(latest_version);
+    } else {
+        fprintf(stderr, "Failed to get the latest core version.\n");
+    }
     
     if (create_directories() != 0) {
         return 1;
