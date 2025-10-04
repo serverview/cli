@@ -12,11 +12,20 @@
 
 const char *core_download_path = "/tmp/svcore";
 
-int download_core(const char *version) {
-    printf(BOLD_CYAN "Downloading core version %s...\n" COLOR_RESET, version);
+int download_core(const char *version_tag) { // version_tag is for example "v0.0.3"
+    printf(BOLD_CYAN "Downloading core version %s...\n" COLOR_RESET, version_tag);
+
+    // Get version without 'v' prefix
+    const char *version_number = version_tag;
+    if (version_number[0] == 'v') {
+        version_number++;
+    }
+
+    char filename[128];
+    snprintf(filename, sizeof(filename), "svcore_%s_linux_amd64", version_number);
 
     char url[256];
-    snprintf(url, sizeof(url), "https://github.com/serverview/core/releases/download/%s/core", version);
+    snprintf(url, sizeof(url), "https://github.com/serverview/core/releases/download/%s/%s", version_tag, filename);
 
     if (download_file(url, core_download_path) != 0) {
         fprintf(stderr, BOLD_RED "Failed to download core.\n" COLOR_RESET);
