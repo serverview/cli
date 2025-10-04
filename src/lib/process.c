@@ -6,7 +6,9 @@
 #include <sys/stat.h>
 #include <signal.h>
 #include <errno.h>
+#include <fcntl.h>
 #include "process.h"
+#include "config.h"
 
 #define SVCORE_EXECUTABLE "/usr/local/sbin/svcore"
 
@@ -51,20 +53,69 @@ int start_process(const char *config_path, const char *pid_file) {
         }
     }
 
+    SiteConfig *config = load_site_config(config_path);
+    if (!config) {
+        fprintf(stderr, "Failed to load site configuration.\n");
+        return -1;
+    }
+
     pid = fork();
     if (pid < 0) {
         perror("Failed to fork");
+        free_site_config(config);
         return -1;
     }
 
     if (pid == 0) { // Child process
-        execl(SVCORE_EXECUTABLE, SVCORE_EXECUTABLE, "--config", config_path, (char *)NULL);
+        // Set environment variables
+        if (config->port) {
+            setenv("PORT", config->port, 1);
+        }
+        if (config->base_path) {
+            setenv("BASE_PATH", config->base_path, 1);
+        }
+        if (config->num_index_files > 0) {
+            size_t total_len = 0;
+            for (int i = 0; i < config->num_index_files; i++) {
+                total_len += strlen(config->index_files[i]);
+            }
+            total_len += config->num_index_files; // for commas and null terminator
+
+            char *index_files_str = malloc(total_len);
+            if (index_files_str) {
+                index_files_str[0] = '\0';
+                for (int i = 0; i < config->num_index_files; i++) {
+                    strcat(index_files_str, config->index_files[i]);
+                    if (i < config->num_index_files - 1) {
+                        strcat(index_files_str, ",");
+                    }
+                }
+                setenv("INDEX_FILES", index_files_str, 1);
+                free(index_files_str);
+            }
+        }
+
+        free_site_config(config); // Free config in child before exec
+
+        // Redirect stdout and stderr to /dev/null
+        int dev_null = open("/dev/null", O_WRONLY);
+        if (dev_null == -1) {
+            perror("Failed to open /dev/null");
+            exit(1);
+        }
+        dup2(dev_null, STDOUT_FILENO);
+        dup2(dev_null, STDERR_FILENO);
+        close(dev_null);
+
+        execl(SVCORE_EXECUTABLE, SVCORE_EXECUTABLE, (char *)NULL);
         // execl only returns if there's an error
         perror("Failed to execute " SVCORE_EXECUTABLE);
         exit(1);
     }
 
     // Parent process
+    free_site_config(config); // Free config in parent
+
     if (write_pid_file(pid_file, pid) != 0) {
         // Failed to write pid file, kill the child process
         kill(pid, SIGKILL);
