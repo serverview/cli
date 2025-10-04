@@ -4,6 +4,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 // Import project's libs
 #include "../lib/color.h"
@@ -116,6 +117,21 @@ int create_default_website() {
     return 0;
 }
 
+int enable_default_site() {
+    printf(BOLD_CYAN "Enabling default site...\n" COLOR_RESET);
+
+    const char *target = "/etc/serverview/sites-available/default";
+    const char *linkpath = "/etc/serverview/sites-enabled/default";
+
+    if (symlink(target, linkpath) != 0) {
+        perror(BOLD_RED "Failed to enable default site" COLOR_RESET);
+        return 1;
+    }
+
+    printf(BOLD_GREEN "Default site enabled successfully.\n" COLOR_RESET);
+    return 0;
+}
+
 int setup() {
     printf(BOLD_CYAN "Setting up the environment...\n" COLOR_RESET);
 
@@ -145,6 +161,9 @@ int setup() {
         return 1;
     }
     if (create_default_website() != 0) {
+        return 1;
+    }
+    if (enable_default_site() != 0) {
         return 1;
     }
 
