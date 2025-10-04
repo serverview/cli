@@ -10,6 +10,43 @@
 #include "../lib/fs.h"
 #include "../lib/download.h"
 
+const char *core_download_path = "/tmp/svcore";
+
+int download_core(const char *version) {
+    printf(BOLD_CYAN "Downloading core version %s...\n" COLOR_RESET, version);
+
+    char url[256];
+    snprintf(url, sizeof(url), "https://github.com/serverview/core/releases/download/%s/core", version);
+
+    if (download_file(url, core_download_path) != 0) {
+        fprintf(stderr, BOLD_RED "Failed to download core.\n" COLOR_RESET);
+        return 1;
+    }
+
+    return 0;
+}
+
+int install_core() {
+    printf(BOLD_CYAN "Installing core...\n" COLOR_RESET);
+
+    const char *install_path = "/usr/local/sbin/svcore";
+
+    // Move the file
+    if (rename(core_download_path, install_path) != 0) {
+        perror(BOLD_RED "Failed to move core to installation directory" COLOR_RESET);
+        return 1;
+    }
+
+    // Make it executable
+    if (chmod(install_path, 0755) != 0) {
+        perror(BOLD_RED "Failed to make core executable" COLOR_RESET);
+        return 1;
+    }
+
+    printf(BOLD_GREEN "Core installed successfully.\n" COLOR_RESET);
+    return 0;
+}
+
 int create_directories() {
     printf(BOLD_CYAN "Creating necessary directories...\n" COLOR_RESET);
 
@@ -74,11 +111,22 @@ int setup() {
     printf(BOLD_CYAN "Setting up the environment...\n" COLOR_RESET);
 
     char *latest_version = get_latest_core_version();
-    if (latest_version != NULL) {
-        printf("Latest core version: %s\n", latest_version);
-        free(latest_version);
-    } else {
+    if (latest_version == NULL) {
         fprintf(stderr, "Failed to get the latest core version.\n");
+        return 1; // Exit if we can't get the version
+    }
+    
+    printf("Latest core version: %s\n", latest_version);
+
+    if (download_core(latest_version) != 0) {
+        free(latest_version);
+        return 1;
+    }
+
+    free(latest_version); // free the version string as soon as we are done with it
+
+    if (install_core() != 0) {
+        return 1;
     }
     
     if (create_directories() != 0) {
