@@ -44,7 +44,7 @@ static int read_pid_file(const char *pid_file) {
     return pid;
 }
 
-int start_process(const char *config_path, const char *pid_file) {
+int start_process(const char *site_name, const char *config_path, const char *pid_file) {
     pid_t pid = read_pid_file(pid_file);
     if (pid > 0) {
         // Check if the process is actually running
@@ -123,11 +123,11 @@ int start_process(const char *config_path, const char *pid_file) {
         return -1;
     }
 
-    printf("Process started with PID %d.\n", pid);
+    printf("Site %s started with PID %d.\n", site_name, pid);
     return pid;
 }
 
-int stop_process(const char *pid_file) {
+int stop_process(const char *site_name, const char *pid_file) {
     pid_t pid = read_pid_file(pid_file);
     if (pid <= 0) {
         fprintf(stderr, "Process is not running.\n");
@@ -146,23 +146,23 @@ int stop_process(const char *pid_file) {
     // Remove the pid file
     unlink(pid_file);
 
-    printf("Process with PID %d stopped.\n", pid);
+    printf("Site %s stopped.\n", site_name);
     return 0;
 }
 
-int get_process_status(const char *pid_file) {
+int get_process_status(const char *site_name, const char *pid_file) {
     pid_t pid = read_pid_file(pid_file);
     if (pid <= 0) {
-        printf("Process is not running.\n");
+        printf("Site %s is not running.\n", site_name);
         return 0;
     }
 
     if (kill(pid, 0) == 0) {
-        printf("Process is running with PID %d.\n", pid);
+        printf("Site %s is running with PID %d.\n", site_name, pid);
         return pid;
     } else {
         if (errno == ESRCH) {
-            printf("Process with PID %d is not running (stale PID file).\n", pid);
+            printf("Site %s is not running (stale PID file).\n", site_name);
             // Clean up stale pid file
             unlink(pid_file);
         } else {

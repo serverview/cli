@@ -35,8 +35,7 @@ int start_all() {
             char pid_file[PATH_MAX];
             snprintf(pid_file, sizeof(pid_file), "/var/run/serverview/%s.pid", entry->d_name);
 
-            printf("Starting site: %s\n", entry->d_name);
-            start_process(config_path, pid_file);
+            start_process(entry->d_name, config_path, pid_file);
         }
     }
 

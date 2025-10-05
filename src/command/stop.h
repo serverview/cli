@@ -3,4 +3,4 @@
 
 int stop(const char *site_name);
 
-#endif
+#endif // STOP_H

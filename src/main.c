@@ -14,6 +14,7 @@
 #include "command/stop-all.h"
 #include "command/start.h"
 #include "command/stop.h"
+#include "command/status.h"
 
 // Program entry point, aka main function
 int main(int argc, char *argv[]) {
@@ -35,6 +36,9 @@ int main(int argc, char *argv[]) {
             printf(BOLD_CYAN "Usage: %s <command> [options]\n\n" COLOR_RESET, argv[0]);
             printf("Commands:\n");
             printf("  setup      Set up the environment\n");
+            printf("  start      Start a specific site by name\n");
+            printf("  stop       Stop a specific site by name\n");
+            printf("  status     Get the status of a specific site\n");
             printf("  start-all  Start all enabled sites\n");
             printf("  stop-all   Stop all enabled sites\n");
             printf("\nFlags:\n");
@@ -48,12 +52,15 @@ int main(int argc, char *argv[]) {
         } else if (strcmp(command, "stop-all") == 0) {
             printf("Usage: %s stop-all\n\n", argv[0]);
             printf("Stop all enabled sites.\n");
-        } else if (strcmp(command, "start")) {
+        } else if (strcmp(command, "start") == 0) {
             printf("Usage: %s start <site-name>\n\n", argv[0]);
             printf("Start the specified site.\n");
         } else if (strcmp(command, "stop") == 0) {
             printf("Usage: %s stop <site-name>\n\n", argv[0]);
             printf("Stop the specified site.\n");
+        } else if (strcmp(command, "status") == 0) {
+            printf("Usage: %s status <site-name>\n\n", argv[0]);
+            printf("Get the status of the specified site.\n");
         } else {
             fprintf(stderr, BOLD_RED "Help for command '%s' is not yet implemented.\n" COLOR_RESET, command);
         }
@@ -73,9 +80,23 @@ int main(int argc, char *argv[]) {
     } else if (strcmp(command, "stop-all") == 0) {
         stop_all();
     } else if (strcmp(command, "start") == 0) {
-        /* code */
+        if (argc < 3) {
+            fprintf(stderr, BOLD_RED "Error: Missing site name for start command.\n" COLOR_RESET);
+            return 1;
+        }
+        start(argv[2]);
     } else if (strcmp(command, "stop") == 0) {
-        /* code */
+        if (argc < 3) {
+            fprintf(stderr, BOLD_RED "Error: Missing site name for stop command.\n" COLOR_RESET);
+            return 1;
+        }
+        stop(argv[2]);
+    } else if (strcmp(command, "status") == 0) {
+        if (argc < 3) {
+            fprintf(stderr, BOLD_RED "Error: Missing site name for status command.\n" COLOR_RESET);
+            return 1;
+        }
+        status(argv[2]);
     } else {
         fprintf(stderr, BOLD_RED "%s: '%s' is not a %s command. See '%s --help'.\n" COLOR_RESET, argv[0], command, argv[0], argv[0]);
         return 1;
