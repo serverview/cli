@@ -3,13 +3,17 @@
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <linux/limits.h>
 
 // Import project's libs
 #include "lib/color.h"
+
+// Import command headers
 #include "command/setup.h"
 #include "command/start-all.h"
 #include "command/stop-all.h"
-#include <linux/limits.h>
+#include "command/start.h"
+#include "command/stop.h"
 
 // Program entry point, aka main function
 int main(int argc, char *argv[]) {
@@ -44,6 +48,12 @@ int main(int argc, char *argv[]) {
         } else if (strcmp(command, "stop-all") == 0) {
             printf("Usage: %s stop-all\n\n", argv[0]);
             printf("Stop all enabled sites.\n");
+        } else if (strcmp(command, "start")) {
+            printf("Usage: %s start <site-name>\n\n", argv[0]);
+            printf("Start the specified site.\n");
+        } else if (strcmp(command, "stop") == 0) {
+            printf("Usage: %s stop <site-name>\n\n", argv[0]);
+            printf("Stop the specified site.\n");
         } else {
             fprintf(stderr, BOLD_RED "Help for command '%s' is not yet implemented.\n" COLOR_RESET, command);
         }
@@ -62,6 +72,10 @@ int main(int argc, char *argv[]) {
         start_all();
     } else if (strcmp(command, "stop-all") == 0) {
         stop_all();
+    } else if (strcmp(command, "start") == 0) {
+        /* code */
+    } else if (strcmp(command, "stop") == 0) {
+        /* code */
     } else {
         fprintf(stderr, BOLD_RED "%s: '%s' is not a %s command. See '%s --help'.\n" COLOR_RESET, argv[0], command, argv[0], argv[0]);
         return 1;
