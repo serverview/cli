@@ -11,6 +11,7 @@
 #include "../lib/fs.h"
 #include "../lib/download.h"
 #include "../lib/process.h"
+#include "../lib/version.h"
 
 const char *core_download_path = "/tmp/svcore";
 
@@ -66,6 +67,7 @@ int create_directories() {
         "/etc/serverview",
         "/etc/serverview/sites-enabled",
         "/etc/serverview/sites-available",
+        "/etc/serverview/version",
         "/var/log/serverview",
         "/var/serverview/default",
         "/var/run/serverview"
@@ -190,6 +192,10 @@ int setup(const char *executable_path) {
 
     printf(BOLD_CYAN "Setting up the environment...\n" COLOR_RESET);
 
+    if (create_directories() != 0) {
+        return 1;
+    }
+
     char *latest_version = get_latest_core_version();
     if (latest_version == NULL) {
         fprintf(stderr, "Failed to get the latest core version.\n");
@@ -203,15 +209,17 @@ int setup(const char *executable_path) {
         return 1;
     }
 
-    free(latest_version); // free the version string as soon as we are done with it
-
     if (install_core() != 0) {
+        free(latest_version);
         return 1;
     }
-    
-    if (create_directories() != 0) {
-        return 1;
+
+    if (save_component_version("core", latest_version) != 0) {
+        fprintf(stderr, "Warning: Could not save core version.\n");
     }
+
+    free(latest_version);
+
     if (create_default_config_file() != 0) {
         return 1;
     }

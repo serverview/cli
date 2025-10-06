@@ -1,3 +1,6 @@
+// App version
+#define CLI_VERSION "0.1.0"
+
 // Import standard libs
 #include <stdio.h>
 #include <string.h>
@@ -15,6 +18,7 @@
 #include "command/start.h"
 #include "command/stop.h"
 #include "command/status.h"
+#include "command/upgrade.h"
 
 // Program entry point, aka main function
 int main(int argc, char *argv[]) {
@@ -36,6 +40,7 @@ int main(int argc, char *argv[]) {
             printf(BOLD_CYAN "Usage: %s <command> [options]\n\n" COLOR_RESET, argv[0]);
             printf("Commands:\n");
             printf("  setup      Set up the environment\n");
+            printf("  upgrade    Upgrade the core to the latest version\n");
             printf("  start      Start a specific site by name\n");
             printf("  stop       Stop a specific site by name\n");
             printf("  status     Get the status of a specific site\n");
@@ -46,6 +51,9 @@ int main(int argc, char *argv[]) {
         } else if (strcmp(command, "setup") == 0) {
             printf("Usage: %s setup\n\n", argv[0]);
             printf("Set up the environment for the server view CLI.\n");
+        } else if (strcmp(command, "upgrade") == 0) {
+            printf("Usage: %s upgrade\n\n", argv[0]);
+            printf("Upgrade the core to the latest version.\n");
         } else if (strcmp(command, "start-all") == 0) {
             printf("Usage: %s start-all\n\n", argv[0]);
             printf("Start all enabled sites.\n");
@@ -75,6 +83,8 @@ int main(int argc, char *argv[]) {
             return 1;
         }
         setup(resolved_path);
+    } else if (strcmp(command, "upgrade") == 0) {
+        upgrade();
     } else if (strcmp(command, "start-all") == 0) {
         start_all();
     } else if (strcmp(command, "stop-all") == 0) {
