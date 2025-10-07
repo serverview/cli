@@ -6,20 +6,12 @@
 #include "../lib/color.h"
 #include "../lib/download.h"
 #include "../lib/version.h"
+#include "start-all.h"
+#include "stop-all.h"
 
 // Forward declarations for functions defined in setup.c
 extern int download_core(const char *version_tag);
 extern int install_core();
-extern int start_service();
-
-static int stop_service() {
-    printf(BOLD_CYAN "Stopping svcore service...\n" COLOR_RESET);
-    if (system("systemctl stop svcore") != 0) {
-        fprintf(stderr, BOLD_YELLOW "Failed to stop svcore service (maybe it was not running?).\n" COLOR_RESET);
-    }
-    printf(BOLD_GREEN "svcore service stopped.\n" COLOR_RESET);
-    return 0;
-}
 
 int upgrade() {
     if (geteuid() != 0) {
@@ -53,11 +45,11 @@ int upgrade() {
 
     printf(BOLD_CYAN "Upgrading core from %s to %s...\n" COLOR_RESET, installed_version, latest_version);
 
-    stop_service();
+    stop_all();
 
     if (download_core(latest_version) != 0) {
         fprintf(stderr, BOLD_RED "Failed to download new version.\n" COLOR_RESET);
-        start_service(); // Attempt to restart the service
+        start_all(); // Attempt to restart the service
         free(installed_version);
         free(latest_version);
         return 1;
@@ -65,7 +57,7 @@ int upgrade() {
 
     if (install_core() != 0) {
         fprintf(stderr, BOLD_RED "Failed to install new version.\n" COLOR_RESET);
-        start_service(); // Attempt to restart the service
+        start_all(); // Attempt to restart the service
         free(installed_version);
         free(latest_version);
         return 1;
@@ -77,7 +69,7 @@ int upgrade() {
 
     printf(BOLD_GREEN "Core upgraded successfully to %s.\n" COLOR_RESET, latest_version);
 
-    start_service();
+    start_all();
 
     free(installed_version);
     free(latest_version);
