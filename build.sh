@@ -1,2 +1,2 @@
 #!/bin/bash
-gcc -o dist/svctl $(find src -name "*.c") -lcurl
+gcc -o dist/svctl $(find src -name "*.c") -lcurl -ljson-c

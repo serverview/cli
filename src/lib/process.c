@@ -16,7 +16,6 @@
 static int write_pid_file(const char *pid_file, pid_t pid) {
     FILE *file = fopen(pid_file, "w");
     if (!file) {
-        fprintf(stderr, "DEBUG: Failed to open PID file %s for writing: %s\n", pid_file, strerror(errno));
         perror("Could not open PID file for writing");
         return -1;
     }

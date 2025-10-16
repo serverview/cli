@@ -1,4 +1,3 @@
-// Import standard libs
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -35,7 +34,6 @@ int get_request(const char *url, Response *res, struct curl_slist *headers) {
     res->data = malloc(1);
     res->size = 0;
 
-    curl_global_init(CURL_GLOBAL_DEFAULT);
     curl = curl_easy_init();
     if(curl) {
         curl_easy_setopt(curl, CURLOPT_URL, url);
@@ -49,15 +47,12 @@ int get_request(const char *url, Response *res, struct curl_slist *headers) {
         if(curl_res != CURLE_OK) {
             fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(curl_res));
             curl_easy_cleanup(curl);
-            curl_global_cleanup();
             return -1;
         }
         curl_easy_cleanup(curl);
     } else {
         fprintf(stderr, "Failed to initialize CURL\n");
-        curl_global_cleanup();
         return -1;
     }
-    curl_global_cleanup();
     return 0;
 }

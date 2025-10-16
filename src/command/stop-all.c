@@ -32,7 +32,9 @@ int stop_all() {
                 *dot = '\0';
             }
 
-            stop_process(site_name, pid_file);
+            if (stop_process(site_name, pid_file) == -1) {
+                fprintf(stderr, "Error: Failed to stop site %s.\n", site_name);
+            }
         }
     }
 

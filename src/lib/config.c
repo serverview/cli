@@ -57,13 +57,41 @@ SiteConfig* load_site_config(const char *filepath) {
 
             if (strcmp(key, "port") == 0) {
                 config->port = strdup(value);
+                if (config->port == NULL) {
+                    perror("Could not duplicate port string");
+                    free_site_config(config);
+                    fclose(file);
+                    if (line) free(line);
+                    return NULL;
+                }
             } else if (strcmp(key, "base_path") == 0) {
                 config->base_path = strdup(value);
+                if (config->base_path == NULL) {
+                    perror("Could not duplicate base_path string");
+                    free_site_config(config);
+                    fclose(file);
+                    if (line) free(line);
+                    return NULL;
+                }
             } else if (strcmp(key, "index_files") == 0) {
                 char *token = strtok(value, " ");
                 while (token) {
                     config->index_files = realloc(config->index_files, sizeof(char*) * (config->num_index_files + 1));
+                if (config->index_files == NULL) {
+                    perror("Could not reallocate memory for index files");
+                    free_site_config(config); // Free already allocated memory
+                    fclose(file);
+                    if (line) free(line);
+                    return NULL;
+                }
                     config->index_files[config->num_index_files] = strdup(token);
+                    if (config->index_files[config->num_index_files] == NULL) {
+                        perror("Could not duplicate index_files string");
+                        free_site_config(config);
+                        fclose(file);
+                        if (line) free(line);
+                        return NULL;
+                    }
                     config->num_index_files++;
                     token = strtok(NULL, " ");
                 }

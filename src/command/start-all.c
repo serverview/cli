@@ -35,7 +35,9 @@ int start_all() {
             char pid_file[PATH_MAX];
             snprintf(pid_file, sizeof(pid_file), "/var/run/serverview/%s.pid", entry->d_name);
 
-            start_process(entry->d_name, config_path, pid_file);
+            if (start_process(entry->d_name, config_path, pid_file) == -1) {
+                fprintf(stderr, "Error: Failed to start site %s.\n", entry->d_name);
+            }
         }
     }
 

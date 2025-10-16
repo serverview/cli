@@ -14,9 +14,8 @@ int start(const char *site_name) {
     if (len != -1) {
         config_path[len] = '\0'; // Null-terminate the path
     } else {
-        // If readlink fails, assume it's not a symlink and use the original path
-        strncpy(config_path, symlink_path, sizeof(config_path) - 1);
-        config_path[sizeof(config_path) - 1] = '\0';
+        fprintf(stderr, "Error: Site '%s' is not enabled or symlink is broken.\n", site_name);
+        return 1;
     }
 
     char pid_file[256];

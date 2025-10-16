@@ -1,6 +1,6 @@
 #ifndef UPGRADE_H
 #define UPGRADE_H
 
-int upgrade();
+int upgrade(const char *executable_path);
 
 #endif
