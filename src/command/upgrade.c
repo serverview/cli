@@ -28,9 +28,15 @@ int update_cli(const char *current_cli_path) {
 
     const char *current_cli_version = CLI_VERSION; // Use the defined macro
 
+    // Get latest CLI version without 'v' prefix for comparison
+    const char *latest_cli_version_compare = latest_cli_version;
+    if (latest_cli_version_compare[0] == 'v') {
+        latest_cli_version_compare++;
+    }
+
     printf("Current CLI version: %s, Latest CLI version: %s\n", current_cli_version, latest_cli_version);
 
-    if (strcmp(current_cli_version, latest_cli_version) == 0) {
+    if (strcmp(current_cli_version, latest_cli_version_compare) == 0) {
         printf(BOLD_GREEN "You are already on the latest version of the CLI.\n" COLOR_RESET);
         free(latest_cli_version);
         return 0;
